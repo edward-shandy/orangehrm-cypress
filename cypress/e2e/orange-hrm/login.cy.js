@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import loginPage from "../../pom/login/login-pom.cy";
 
 describe('login feature', () => {
     beforeEach(() => {
@@ -14,7 +15,7 @@ describe('login feature', () => {
 
     //TC-02
     it('Pengguna dapat menginput username', () => {
-      cy.get('input[name="username"]').should('exist').type('Admin');
+      loginPage.inputUsername().should('exist').type('Admin');
     })
 
     //TC-03
@@ -24,7 +25,7 @@ describe('login feature', () => {
 
     //TC-04
     it('Pengguna tidak dapat melakukan login tanpa input username', () => {
-      cy.get('input[name="username"]').should('exist').clear().should('have.value', '');
+      loginPage.inputUsername().should('exist').clear().should('have.value', '');
       cy.get('input[name="password"]').should('exist').type('admin123');
       cy.get('button[type="submit"]').click();
       cy.get('span.oxd-input-field-error-message').should('contain','Required');
@@ -32,7 +33,7 @@ describe('login feature', () => {
 
     //TC-05
     it('Pengguna tidak dapat melakukan login tanpa input password', () => {
-      cy.get('input[name="username"]').should('exist').type('Admin');
+      loginPage.inputUsername().should('exist').type('Admin');
       cy.get('input[name="password"]').should('exist').clear().should('have.value', '');
       cy.get('button[type="submit"]').click();
       cy.get('span.oxd-input-field-error-message').should('contain','Required');
@@ -46,7 +47,7 @@ describe('login feature', () => {
 
     //TC-07
     it('Pengguna tidak dapat melakukan login dengan username yang salah', () => {
-      cy.get('input[name="username"]').should('exist').type('Admin-test');
+      loginPage.inputUsername().should('exist').type('Admin-test');
       cy.get('input[name="password"]').should('exist').type('admin123');
       cy.get('button[type="submit"]').click();
       cy.get('p.oxd-alert-content-text').should('contain','Invalid credentials');
@@ -54,7 +55,7 @@ describe('login feature', () => {
 
     //TC-08
     it('Pengguna tidak dapat melakukan login dengan password yang salah', () => {
-      cy.get('input[name="username"]').should('exist').type('Admin');
+      loginPage.inputUsername().should('exist').type('Admin');
       cy.get('input[name="password"]').should('exist').type('admin123-test');
       cy.get('button[type="submit"]').click();
       cy.get('p.oxd-alert-content-text').should('contain','Invalid credentials');
@@ -62,17 +63,25 @@ describe('login feature', () => {
 
     //TC-09
     it('Pengguna tidak dapat melakukan login dengan username dan password yang mengandung spesial karakter', () => {
-      cy.get('input[name="username"]').should('exist').type('@Admin');
+      loginPage.inputUsername().should('exist').type('@Admin');
       cy.get('input[name="password"]').should('exist').type('@admin123-test');
       cy.get('button[type="submit"]').click();
       cy.get('p.oxd-alert-content-text').should('contain','Invalid credentials');
     })
 
     //TC-10
-    it.skip('Pengguna berhasil melakukan login', () => {
-      cy.get('input[name="username"]').should('exist').type('Admin');
+    it('Pengguna berhasil melakukan login', () => {
+      loginPage.inputUsername().should('exist').type('Admin');
       cy.get('input[name="password"]').should('exist').type('admin123');
+      cy.intercept('GET','https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/dashboard/employees/action-summary').as('actionSummary');
+      cy.intercept('GET', '**/shortcuts').as('shortcuts');
+      cy.intercept('GET', '**/subunit').as('subunit');
+      cy.intercept('GET', '**/locations').as('locations');
       cy.get('button[type="submit"]').click();
+      cy.wait('@actionSummary');
+      cy.wait('@shortcuts');
+      cy.wait('@subunit');
+      cy.wait('@locations');
       cy.get('span.oxd-main-menu-item--name').should('contain','Dashboard');
     })
 })
