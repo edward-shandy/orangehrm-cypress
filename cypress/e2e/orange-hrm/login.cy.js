@@ -77,11 +77,13 @@ describe('login feature', () => {
       cy.intercept('GET', '**/shortcuts').as('shortcuts');
       cy.intercept('GET', '**/subunit').as('subunit');
       cy.intercept('GET', '**/locations').as('locations');
+      cy.intercept('GET', '**/time-at-work*').as('timeAtWork');
       cy.get('button[type="submit"]').click();
       cy.wait('@actionSummary');
       cy.wait('@shortcuts');
       cy.wait('@subunit');
       cy.wait('@locations');
+      cy.wait('@timeAtWork');
       cy.get('span.oxd-main-menu-item--name').should('contain','Dashboard');
     })
 })
